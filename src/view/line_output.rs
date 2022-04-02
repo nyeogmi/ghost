@@ -21,8 +21,8 @@ impl LineOutput {
         self.output.borrow_mut().draw(brush, menu);
     }
 
-    pub(crate) fn add_line(&self, text: String) {
-        self.output.borrow_mut().add_line(text)
+    pub(crate) fn add_line(&self, indent: isize, postdent: isize, text: String) {
+        self.output.borrow_mut().add_line(indent, postdent, text)
     }
 }
 
@@ -36,8 +36,8 @@ impl LineOutputImpl {
     }
 
 
-    pub fn add_line(&mut self, text: String) {
-        self.lines.push_back(Line::new(text));
+    pub fn add_line(&mut self, indent: isize, postdent: isize, text: String) {
+        self.lines.push_back(Line::new(indent, postdent, text));
         while self.lines.len() > 80 {
             self.lines.pop_front();
         }
@@ -50,13 +50,13 @@ impl LineOutputImpl {
         let mut y = brush.rect().max_y();
 
         for l in self.lines.iter().rev() {
-            let stamp = l.stamp_for(width);
+            let stamp = l.stamp_for(width - l.indent - l.postdent);
             let height = stamp.1.rect().height().max(1);
             y -= height;
             stamp.1.draw(brush.region(
                 CellRect::new(
-                    CellPoint::new(brush.rect().min_x(), y),
-                    CellSize::new(brush.rect().width(), height),
+                    CellPoint::new(brush.rect().min_x() + l.indent, y),
+                    CellSize::new(brush.rect().width() - l.indent - l.postdent, height),
                 )
             ));
 
@@ -66,19 +66,22 @@ impl LineOutputImpl {
 }
 
 struct Line {
+    pub indent: isize,
+    pub postdent: isize,
     pub text: String,
     pub stamp: RefCell<(isize, Stamp)>,
 }
 
 impl Line {
-    fn new(text: String) -> Self {
+    fn new(indent: isize, postdent: isize, text: String) -> Self {
         return Self {
+            indent, postdent,
             text,
             stamp: RefCell::new((-1, Stamp::new())),
         }
     }
     fn stamp_for(&self, width: isize) -> Ref<'_, (isize, Stamp)> {
-        const HANGING_INDENT: isize = 1;
+        const HANGING_INDENT: isize = 0; // Nyeo note: this system totally breaks word wrap rn
         {
             let s = self.stamp.borrow();
             if s.0 == width {
@@ -88,7 +91,7 @@ impl Line {
 
         let stamp = Stamp::new();
         let brush = stamp
-            .brush_at(rect(0, 0, width - HANGING_INDENT, isize::MAX))
+            .brush_at(rect(0, 0, width, isize::MAX))
             .offset_rect(vec2(HANGING_INDENT, 0));
         brush.at(CellPoint::new(-HANGING_INDENT, 0)).putfs(&self.text);
         self.stamp.replace((width, stamp));

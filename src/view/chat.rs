@@ -51,12 +51,12 @@ impl Chat {
 
     pub fn add_message(&mut self, message: Message) {
         if self.last_sender.as_ref() != Some(&message.sender) {
-            self.line_output.add_line("".to_string());
-            self.line_output.add_line(format!("\u{ffff}\u{01}\u{04}<\u{ffff}\u{01}\u{07}{}\u{ffff}\u{01}\u{26}{}\u{ffff}\u{01}\u{04}>@\u{ffff}\u{01}\u{23}{}", message.sigil, message.sender, message.meta));
-            self.line_output.add_line(message.body);
+            self.line_output.add_line(0, 0, "".to_string());
+            self.line_output.add_line(0, 0, format!("\u{ffff}\u{01}\u{04}<\u{ffff}\u{01}\u{07}{}\u{ffff}\u{01}\u{26}{}\u{ffff}\u{01}\u{04}>@\u{ffff}\u{01}\u{23}{}", message.sigil, message.sender, message.meta));
+            self.line_output.add_line(1, 1, message.body);
             self.last_sender = Some(message.sender);
         } else {
-            self.line_output.add_line(message.body);
+            self.line_output.add_line(1, 1, message.body);
         }
 
     }
