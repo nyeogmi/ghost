@@ -1,4 +1,4 @@
-![screenshot.png](screenshot: short irc conversation and "Hello world!" in the right pane)
+![screenshot: short irc conversation and "Hello world!" in the right pane](screenshot.png)
 
 I've been playing a lot of hacking sims lately and decided to write some of the nuts and bolts of one.
 
