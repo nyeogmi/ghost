@@ -1,3 +1,5 @@
+![screenshot.png](screenshot: short irc conversation and "Hello world!" in the right pane)
+
 I've been playing a lot of hacking sims lately and decided to write some of the nuts and bolts of one.
 
 This is an attempt to build a UI using my older library, chiroptui. To my horror, chiroptui has a _terrible_ API!
